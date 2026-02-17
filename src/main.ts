@@ -27,13 +27,15 @@ import { setupTeamsCommands } from "./commands/teams.js";
 import { setupUsersCommands } from "./commands/users.js";
 import { setupDocumentsCommands } from "./commands/documents.js";
 import { outputUsageInfo } from "./utils/usage.js";
+import { setGlobalFields } from "./utils/output.js";
 
 // Setup main program
 program
   .name("linearis")
   .description("CLI for Linear.app with JSON output")
   .version(pkg.version)
-  .option("--api-token <token>", "Linear API token");
+  .option("--api-token <token>", "Linear API token")
+  .option("--fields <fields>", "limit output to specific fields (comma-separated, e.g. identifier,title,createdAt)");
 
 // Default action - show help when no subcommand
 program.action(() => {
@@ -56,6 +58,12 @@ setupDocumentsCommands(program);
 program.command("usage")
   .description("show usage info for *all* tools")
   .action(() => outputUsageInfo(program));
+
+// Apply global --fields filter before commands execute
+program.hook("preAction", (thisCommand) => {
+  const rootOpts = thisCommand.opts();
+  setGlobalFields(rootOpts.fields);
+});
 
 // Parse command line arguments
 program.parse();

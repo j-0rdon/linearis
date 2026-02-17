@@ -1,8 +1,40 @@
 /**
+ * Filter data to only include specified fields.
+ * Supports nested fields via dot notation (e.g. "creator.name").
+ */
+function pickFields(obj: any, fields: string[]): any {
+  const result: any = {};
+  for (const field of fields) {
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".", 2);
+      if (obj[parent] != null) {
+        if (!result[parent]) result[parent] = {};
+        result[parent][child] = obj[parent][child];
+      }
+    } else if (obj[field] !== undefined) {
+      result[field] = obj[field];
+    }
+  }
+  return result;
+}
+
+/** Global fields filter, set via --fields flag */
+let _globalFields: string | undefined;
+
+/** Set the global fields filter (called once from main.ts after parsing) */
+export function setGlobalFields(fields: string | undefined): void {
+  _globalFields = fields;
+}
+
+/**
  * Output successful data as formatted JSON
- * 
+ *
+ * When --fields is set globally, output is filtered to only include
+ * the specified fields. Supports dot notation for nested fields
+ * (e.g. "creator.name,identifier,title").
+ *
  * @param data - Data to output (will be JSON serialized)
- * 
+ *
  * @example
  * ```typescript
  * outputSuccess({ id: "123", title: "Issue title" });
@@ -10,6 +42,14 @@
  * ```
  */
 export function outputSuccess(data: any): void {
+  if (_globalFields) {
+    const fieldList = _globalFields.split(",").map((f) => f.trim());
+    if (Array.isArray(data)) {
+      data = data.map((item: any) => pickFields(item, fieldList));
+    } else {
+      data = pickFields(data, fieldList);
+    }
+  }
   console.log(JSON.stringify(data, null, 2));
 }
 
