@@ -8,6 +8,13 @@ Linearis is a CLI tool for Linear.app that outputs structured JSON data, designe
 
 **Design philosophy:** Minimize token usage for LLM agents while providing rich, structured data. The entire usage guide (`linearis usage`) comes in under 1000 tokens.
 
+**This is a fork** of [czottmann/linearis](https://github.com/czottmann/linearis). Upstream is not synced automatically.
+
+### Fork changes
+
+- **`creator` field** on all issue responses (id, name) — follows the assignee pattern
+- **`--creator` filter** on `issues list` and `issues search` — resolves by name, email, or UUID server-side via GraphQL
+
 ## Key Commands
 
 ### Development
