@@ -132,6 +132,7 @@ export interface SearchIssuesArgs {
   creatorId?: string;
   projectId?: string;
   status?: string[];
+  since?: string;
   limit?: number;
 }
 

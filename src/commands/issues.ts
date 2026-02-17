@@ -3,6 +3,7 @@ import { createGraphQLService } from "../utils/graphql-service.js";
 import { GraphQLIssuesService } from "../utils/graphql-issues-service.js";
 import { createLinearService } from "../utils/linear-service.js";
 import { handleAsyncCommand, outputSuccess } from "../utils/output.js";
+import { parseSince } from "../utils/date-parser.js";
 
 /**
  * Setup issues commands on the program
@@ -40,6 +41,7 @@ export function setupIssuesCommands(program: Command): void {
   issues.command("list")
     .description("List issues.")
     .option("--creator <creator>", "filter by creator (name, email, or ID)")
+    .option("--since <duration>", "filter by creation date (e.g. 3d, 1w, 2m)")
     .option("-l, --limit <number>", "limit results", "25")
     .action(
       handleAsyncCommand(
@@ -54,10 +56,11 @@ export function setupIssuesCommands(program: Command): void {
             linearService,
           );
 
-          // Use search with creator filter if provided, otherwise plain list
-          if (options.creator) {
+          // Use filtered search if any filter is provided, otherwise plain list
+          if (options.creator || options.since) {
             const searchArgs = {
               creatorId: options.creator,
+              since: options.since ? parseSince(options.since) : undefined,
               limit: parseInt(options.limit),
             };
             const result = await issuesService.searchIssues(searchArgs);
@@ -85,6 +88,7 @@ export function setupIssuesCommands(program: Command): void {
     .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("--project <project>", "filter by project name or ID")
     .option("--status <status>", "filter by status (comma-separated)")
+    .option("--since <duration>", "filter by creation date (e.g. 3d, 1w, 2m)")
     .option("-l, --limit <number>", "limit results", "10")
     .action(
       handleAsyncCommand(
@@ -105,6 +109,7 @@ export function setupIssuesCommands(program: Command): void {
             creatorId: options.creator, // GraphQL service handles creator resolution
             projectId: options.project, // GraphQL service handles project resolution
             status: options.status ? options.status.split(",") : undefined,
+            since: options.since ? parseSince(options.since) : undefined,
             limit: parseInt(options.limit),
           };
           const result = await issuesService.searchIssues(searchArgs);

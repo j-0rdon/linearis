@@ -783,6 +783,11 @@ export class GraphQLIssuesService {
           issue.project?.id === finalProjectId
         );
       }
+      if (args.since) {
+        results = results.filter((issue: LinearIssue) =>
+          issue.createdAt >= args.since!
+        );
+      }
       if (args.status && args.status.length > 0) {
         results = results.filter((issue: LinearIssue) =>
           args.status!.includes(issue.state.name)
@@ -798,6 +803,7 @@ export class GraphQLIssuesService {
       if (finalAssigneeId) filter.assignee = { id: { eq: finalAssigneeId } };
       if (finalCreatorId) filter.creator = { id: { eq: finalCreatorId } };
       if (finalProjectId) filter.project = { id: { eq: finalProjectId } };
+      if (args.since) filter.createdAt = { gte: args.since };
       if (args.status && args.status.length > 0) {
         filter.state = { name: { in: args.status } };
       }
