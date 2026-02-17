@@ -176,3 +176,5 @@ Comprehensive docs in `docs/`:
 - `build-system.md` - TypeScript compilation, automated builds
 - `testing.md` - Testing approach, manual validation, performance benchmarks
 - `files.md` - Complete file catalog
+
+**Important:** When adding or changing features, update the relevant docs and the "Fork changes" section above. Docs to check: `README.md`, `CLAUDE.md`, and any affected files in `docs/`.
