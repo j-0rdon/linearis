@@ -354,6 +354,18 @@ While automated tests are preferred, some scenarios still require manual testing
 # Test issue listing
 npm start issues list -l 5
 
+# Test issue listing with creator filter
+npm start issues list --creator jordon -l 10
+
+# Test issue listing with date filter
+npm start issues list --since 3d -l 25
+
+# Test combined filters
+npm start issues list --creator jordon --since 1w -l 50
+
+# Test lean output with --fields
+npm start -- --fields identifier,title,creator.name issues list --creator jordon --since 3d
+
 # Test issue reading with ID resolution
 npm start issues read ABC-123
 
@@ -362,6 +374,9 @@ npm start issues create --title "Test Issue" --team ABC
 
 # Test issue search with filters
 npm start issues search "bug" --team ABC --project "Mobile App"
+
+# Test issue search with creator and date filters
+npm start issues search "sidebar" --creator jordon --since 2w
 ```
 
 ### Project Operations

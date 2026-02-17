@@ -86,6 +86,7 @@ fragment CompleteIssue on Issue {
   id identifier title description priority estimate
   state { id name }
   assignee { id name }
+  creator { id name }
   team { id key name }
   project { id name }
   labels { nodes { id name } }
@@ -153,6 +154,8 @@ The GraphQL optimizations are implemented in:
 3. **Fragment Reuse**: Use consistent GraphQL fragments across operations
 4. **Smart Caching**: Leverage GraphQL response structure for efficient data handling
 5. **Lightweight Operations**: Use minimal queries for simple operations like comment creation
+6. **Server-Side Filtering**: --creator and --since filters are applied at the GraphQL level, avoiding over-fetching
+7. **Lean Output**: Global --fields flag reduces JSON payload size by ~97% for targeted queries, significantly reducing token usage when consumed by LLM agents
 
 ## Monitoring Performance
 

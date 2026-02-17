@@ -11,7 +11,7 @@ The architecture emphasizes performance through GraphQL batch operations, single
 ### Command Layer - CLI Interface
 
 - **src/main.ts** - Main program setup with Commander.js, command routing, and global options
-- **src/commands/issues.ts** - Issue management commands (list, search, create, read, update) with enhanced label and parent management
+- **src/commands/issues.ts** - Issue management commands (list, search, create, read, update) with creator/date filtering, enhanced label and parent management
 - **src/commands/projects.ts** - Project operations commands (list, read)
 - **src/commands/comments.ts** - Comment operations (create) with lightweight issue ID resolution
 - **src/commands/teams.ts** - Team operations (list) with workspace team discovery
@@ -24,7 +24,8 @@ The architecture emphasizes performance through GraphQL batch operations, single
 - **src/utils/linear-service.ts** - Complete Linear API service with smart ID resolution and SDK operations
 - **src/queries/** - GraphQL query definitions and fragments for optimized operations
 - **src/utils/auth.ts** - Authentication handling with multiple token source support
-- **src/utils/output.ts** - JSON output formatting and error handling utilities
+- **src/utils/output.ts** - JSON output formatting, global --fields filtering, and error handling utilities
+- **src/utils/date-parser.ts** - Relative date parsing for --since filtering (3d, 1w, 2m, 1y → ISO 8601)
 
 ### Type System - Data Contracts
 
@@ -36,7 +37,7 @@ The architecture emphasizes performance through GraphQL batch operations, single
 
 **Main Entry Point**
 
-- src/main.ts (lines 1-25) - Sets up Commander.js program with global options and subcommand registration
+- src/main.ts - Sets up Commander.js program with global options (--api-token, --fields) and subcommand registration. Uses preAction hook to apply --fields filter before command execution.
 
 **GraphQL Service Layer**
 
@@ -64,7 +65,7 @@ The architecture emphasizes performance through GraphQL batch operations, single
 2. **Authentication** - src/utils/auth.ts (lines 18-38) resolves API token from multiple sources
 3. **Service Creation** - src/utils/linear-service.ts (lines 479-484) creates authenticated LinearService
 4. **API Operations** - Service methods execute optimized GraphQL queries with parallel fetching
-5. **Response Formatting** - src/utils/output.ts (lines 5-7) outputs structured JSON responses
+5. **Response Formatting** - src/utils/output.ts outputs structured JSON responses, filtered by --fields if set
 
 ### Smart ID Resolution Process
 
@@ -105,3 +106,17 @@ const resolveResult = await this.graphQLService.rawRequest(
 ```
 
 This eliminates N+1 query problems by using GraphQL's ability to fetch complex relationships in single requests.
+
+**Server-Side Filtering Pattern** (src/utils/graphql-issues-service.ts)
+
+```typescript
+// Filters applied at GraphQL level — no over-fetching
+const filter: any = {};
+if (finalCreatorId) filter.creator = { id: { eq: finalCreatorId } };
+if (args.since) filter.createdAt = { gte: args.since };
+// Linear returns only matching issues
+```
+
+**Lean Output Pattern** (src/utils/output.ts)
+
+The global `--fields` flag filters JSON output to only include specified fields, reducing response size by ~97% for targeted queries. Supports dot notation for nested fields (e.g. `creator.name`).

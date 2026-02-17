@@ -28,7 +28,7 @@ export interface LinearIssue {
 
 - CreateIssueArgs interface for issue creation parameters
 - UpdateIssueArgs interface for issue updates
-- SearchIssuesArgs interface for search operations
+- SearchIssuesArgs interface for search operations (includes creatorId, since fields)
 
 ### Async/Await Patterns
 
@@ -257,13 +257,14 @@ export function outputError(error: Error): void {
 - graphql-issues-service.ts - Optimized GraphQL issue operations
 - linear-service.ts - Legacy SDK-based business logic and fallback operations
 - auth.ts - Authentication handling
-- output.ts - Response formatting
+- output.ts - Response formatting with global --fields filtering
+- date-parser.ts - Relative date parsing for --since filtering
 - linear-types.d.ts - Type definitions
 - uuid.ts - UUID validation utilities
 
 **Command Layer** - `src/commands/` directory:
 
-- issues.ts - Issue-related commands with enhanced label and parent management
+- issues.ts - Issue-related commands with --creator, --since filtering and enhanced label and parent management
 - projects.ts - Project-related commands
 - comments.ts - Comment operations with lightweight ID resolution
 - teams.ts - Team operations (list) with workspace team discovery

@@ -16,11 +16,11 @@ All source files use modern ES modules with TypeScript for type safety. The proj
 
 **src/utils/graphql-service.ts** - GraphQL client wrapper with raw query execution and batch operation support **src/utils/graphql-issues-service.ts**
 
-- Optimized GraphQL operations for issues with single-query strategy and batch ID resolution **src/utils/linear-service.ts** - Legacy SDK-based Linear API integration with smart ID resolution and fallback operations **src/utils/auth.ts** - Multi-source authentication handling (API token flag, environment variable, token file) **src/utils/output.ts** - JSON response formatting and standardized error handling with async command wrapping **src/utils/embed-parser.ts** - Markdown parsing for Linear upload URL extraction with embed info and expiration tracking **src/utils/file-service.ts** - Authenticated file download service with signed URL support and smart authentication detection
+- Optimized GraphQL operations for issues with single-query strategy and batch ID resolution **src/utils/linear-service.ts** - Legacy SDK-based Linear API integration with smart ID resolution and fallback operations **src/utils/auth.ts** - Multi-source authentication handling (API token flag, environment variable, token file) **src/utils/output.ts** - JSON response formatting, global --fields filtering, and standardized error handling with async command wrapping **src/utils/date-parser.ts** - Relative date parsing for --since filtering (e.g. 3d, 1w, 2m, 1y → ISO 8601 date) **src/utils/embed-parser.ts** - Markdown parsing for Linear upload URL extraction with embed info and expiration tracking **src/utils/file-service.ts** - Authenticated file download service with signed URL support and smart authentication detection
 
 ### Type System
 
-**src/utils/linear-types.d.ts** - Complete TypeScript interfaces for Linear entities (LinearIssue, LinearProject) and operation parameters (CreateIssueArgs, UpdateIssueArgs, SearchIssuesArgs) **src/utils/uuid.ts** - UUID validation utilities for smart ID resolution
+**src/utils/linear-types.d.ts** - Complete TypeScript interfaces for Linear entities (LinearIssue, LinearProject) and operation parameters (CreateIssueArgs, UpdateIssueArgs, SearchIssuesArgs). LinearIssue includes creator field. SearchIssuesArgs includes creatorId and since fields. **src/utils/uuid.ts** - UUID validation utilities for smart ID resolution
 
 ### Query Definitions
 
@@ -43,8 +43,10 @@ All source files use modern ES modules with TypeScript for type safety. The proj
 **src/main.ts (lines 3-25)** - Sets up Commander.js with global options and subcommand registration
 
 - Global `--api-token` option handling
+- Global `--fields` option for lean JSON output with dot notation support
 - Default help action when no subcommand provided
 - Modular command setup via imported functions
+- preAction hook to apply global --fields filter before command execution
 
 **src/commands/*.ts** - Command-specific implementations with consistent patterns:
 
@@ -127,7 +129,9 @@ All source files use modern ES modules with TypeScript for type safety. The proj
 
 **Authentication Flow**: Command options → src/utils/auth.ts → service layer
 
-**Response Flow**: GraphQL/Service results → src/utils/output.ts → JSON console output
+**Response Flow**: GraphQL/Service results → src/utils/output.ts (with optional --fields filtering) → JSON console output
+
+**Date Parsing Flow**: --since flag → src/utils/date-parser.ts → ISO 8601 date → GraphQL createdAt filter
 
 **Query Organization**: src/queries/issues.ts → src/queries/common.ts fragments → GraphQL execution
 

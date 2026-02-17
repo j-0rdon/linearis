@@ -1,15 +1,21 @@
-<!-- Generated: 2025-09-02T10:42:29+02:00 -->
+# Linearis
 
-# Linearis (fork)
+CLI tool for [Linear.app](https://linear.app) with JSON output, smart ID resolution, and optimized GraphQL queries. Designed for LLM agents and humans who prefer structured data.
 
-Forked from [czottmann/linearis](https://github.com/czottmann/linearis) on 2026-02-17 for internal use. This is a self-maintained copy — no upstream updates are pulled automatically.
+> Forked from [czottmann/linearis](https://github.com/czottmann/linearis). This is a self-maintained fork — upstream is not synced automatically.
 
-**Original description:** CLI tool for [Linear.app](https://linear.app) with JSON output, smart ID resolution, and optimized GraphQL queries. Designed for LLM agents and humans who prefer structured data.
+### Fork additions
+
+- `--creator` filter on `issues list` and `issues search` (resolves by name, email, or UUID)
+- `--since` filter on `issues list` and `issues search` (relative durations: `3d`, `1w`, `2m`, `1y`)
+- `--fields` global flag to limit JSON output to specified fields (supports dot notation)
+- `creator` field on all issue responses
 
 ## Setup
 
 ```bash
-cd ~/Tools/linearis
+git clone https://github.com/j-0rdon/linearis.git
+cd linearis
 npm install && npm run build && npm link
 ```
 
@@ -17,14 +23,6 @@ Save a [Linear personal API key](https://linear.app/settings/api) to `~/.linear_
 ```bash
 echo "your-token-here" > ~/.linear_api_token
 ```
-
----
-
-## Why?
-
-There was no Linear CLI client I was happy with. Also I want my LLM agents to work with Linear, but the official Linear MCP (while working fine) eats up ~13k tokens (!!) just by being connected. In comparison, `linearis usage` tells the LLM everything it needs to know and comes in well under 1000 tokens.
-
-**This project scratches my own itches,** and satisfies my own usage patterns of working with Linear: I **do** work with tickets/issues and comments on the command line; I **do not** manage projects or workspaces etc. there. YMMV.
 
 ## Command Examples
 
@@ -40,6 +38,15 @@ linearis labels
 
 # List recent issues
 linearis issues list -l 10
+
+# Filter by creator (name, email, or UUID)
+linearis issues list --creator jordon -l 10
+
+# Filter by creation date (d=days, w=weeks, m=months, y=years)
+linearis issues list --since 3d -l 25
+
+# Combine filters
+linearis issues list --creator jordon --since 1w -l 50
 
 # Search for bugs in specific team/project
 linearis issues search "authentication" --team Platform --project "Auth Service"
@@ -189,6 +196,21 @@ The `cycles list` command supports several flag combinations:
 
 **Note:** Using `--active --around-active` together works but `--active` is redundant since `--around-active` always includes the active cycle.
 
+### Lean Output with --fields
+
+Use the global `--fields` flag to limit JSON output to specific fields. Supports dot notation for nested fields.
+
+```bash
+# Full output (all fields)
+linearis issues list -l 5
+
+# Lean output (specific fields only)
+linearis --fields identifier,title,creator.name issues list -l 5
+
+# Combine with filters for efficient agent queries
+linearis --fields identifier,title,state.name issues list --creator jordon --since 3d
+```
+
 ### Advanced Usage
 
 ```bash
@@ -201,16 +223,10 @@ linearis issues list -l 5 | jq '.[] | .identifier + ": " + .title'
 
 ## Installation
 
-### npm (recommended)
-
-```bash
-npm install -g linearis
-```
-
 ### From source
 
 ```bash
-git clone https://github.com/czottmann/linearis.git
+git clone https://github.com/j-0rdon/linearis.git
 cd linearis
 npm install
 npm run build
@@ -220,7 +236,7 @@ npm link
 ### Development setup
 
 ```bash
-git clone https://github.com/czottmann/linearis.git
+git clone https://github.com/j-0rdon/linearis.git
 cd linearis
 npm install
 npm start  # Development mode using tsx (no compilation needed)
@@ -270,41 +286,10 @@ When the the status of a task in the ticket description has changed (task → ta
 The `issues read` command returns an `embeds` array containing files uploaded to Linear (screenshots, documents, etc.) with signed download URLs and expiration timestamps. Use `embeds download` to download these files when needed.
 ```
 
-## Author / Maintainer
+## Credits
 
-Carlo Zottmann, <carlo@zottmann.dev>, https://c.zottmann.dev, https://github.com/czottmann.
+Originally created by [Carlo Zottmann](https://github.com/czottmann). See [upstream repo](https://github.com/czottmann/linearis) for the original project and its contributors.
 
-This project is neither affiliated with nor endorsed by Linear. I'm just a very happy customer.
+## License
 
-### Sponsoring this project
-
-I don't accept sponsoring in the "GitHub sponsorship" sense[^1] but [next to my own apps, I also sell "Tokens of Appreciation"](https://actions.work/store/?ref=github). Any support is appreciated! 😉
-
-[^1]: Apparently, the German revenue service is still having some fits over "money for nothing??".
-
-> [!TIP]
-> I make Shortcuts-related macOS & iOS productivity apps like [Actions For Obsidian](https://actions.work/actions-for-obsidian), [Browser Actions](https://actions.work/browser-actions) (which adds Shortcuts support for several major browsers), and [BarCuts](https://actions.work/barcuts) (a surprisingly useful contextual Shortcuts launcher). Check them out!
-
-## Contributors 🤙🏼
-
-- [Ryan Rozich](https://github.com/ryanrozich)
-- [Chad Walters](https://github.com/chadrwalters)
-- [Louis Mandelstam](https://github.com/man8)
-- [Ralf Schimmel](https://github.com/ralfschimmel)
-
-## Documentation
-
-- **[docs/project-overview.md](docs/project-overview.md)** - Project purpose, technology stack, and platform support
-- **[docs/architecture.md](docs/architecture.md)** - Component organization, data flow, and performance patterns
-- **[docs/build-system.md](docs/build-system.md)** - TypeScript compilation, automated builds
-- **[docs/testing.md](docs/testing.md)** - Testing approach, manual validation, and performance benchmarks
-- **[docs/development.md](docs/development.md)** - Code patterns, TypeScript standards, and common workflows
-- **[docs/deployment.md](docs/deployment.md)** - Git-based npm install, automated compilation, and production deployment
-- **[docs/files.md](docs/files.md)** - Complete file catalog with descriptions and relationships
-
-## Key Entry Points
-
-- **dist/main.js** - Compiled CLI entry point for production use
-- **src/main.ts** - TypeScript source with Commander.js setup (development)
-- **package.json** - Project configuration with automated build scripts and npm distribution
-- **tsconfig.json** - TypeScript compilation targeting ES2023 with dist/ output
+[MIT](LICENSE.md)
