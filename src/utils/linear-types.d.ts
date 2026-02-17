@@ -17,6 +17,10 @@ export interface LinearIssue {
     id: string;
     name: string;
   };
+  creator?: {
+    id: string;
+    name: string;
+  };
   team: {
     id: string;
     key: string;

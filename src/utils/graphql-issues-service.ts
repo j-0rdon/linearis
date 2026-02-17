@@ -834,6 +834,12 @@ export class GraphQLIssuesService {
           name: issue.assignee.name,
         }
         : undefined,
+      creator: issue.creator
+        ? {
+          id: issue.creator.id,
+          name: issue.creator.name,
+        }
+        : undefined,
       team: {
         id: issue.team.id,
         key: issue.team.key,

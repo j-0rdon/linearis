@@ -45,6 +45,17 @@ export const ISSUE_ASSIGNEE_FRAGMENT = `
 `;
 
 /**
+ * Issue creator relationship
+ * Provides user information for who created the issue
+ */
+export const ISSUE_CREATOR_FRAGMENT = `
+  creator {
+    id
+    name
+  }
+`;
+
+/**
  * Issue team relationship
  * Provides team information including key and name
  */
@@ -152,6 +163,7 @@ export const COMPLETE_ISSUE_FRAGMENT = `
   ${ISSUE_CORE_FIELDS}
   ${ISSUE_STATE_FRAGMENT}
   ${ISSUE_ASSIGNEE_FRAGMENT}
+  ${ISSUE_CREATOR_FRAGMENT}
   ${ISSUE_TEAM_FRAGMENT}
   ${ISSUE_PROJECT_FRAGMENT}
   ${ISSUE_LABELS_FRAGMENT}

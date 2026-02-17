@@ -149,6 +149,15 @@ The CLI can extract and download files uploaded to Linear's private cloud storag
 - `commander` (^14.0.0) - CLI framework
 - `tsx` (^4.20.5) - TypeScript execution for development
 
+## Linear API Reference
+
+Full docs: https://developers.linear.app
+
+- **GraphQL API** — same API Linear uses internally. Schema explorer: https://studio.apollographql.com/public/Linear-API/variant/current/home
+- **Authentication** — personal API keys via Settings > Account > Security & Access. Permissions: Read, Write, Admin, Create issues, Create comments. Can be scoped to specific teams.
+- **Webhooks** — deliver full data objects on create/update for: Issues, Comments, Attachments, Documents, Emoji reactions, Projects, Project updates, Cycles, Labels, Users, Issue SLAs. Managed via Settings > Administration > API (admin only).
+- **Community** — #api channel in Linear's Slack community
+
 ## Documentation
 
 Comprehensive docs in `docs/`:

@@ -1,8 +1,24 @@
 <!-- Generated: 2025-09-02T10:42:29+02:00 -->
 
-# Linearis: An opinionated Linear CLI client
+# Linearis (fork)
 
-CLI tool for [Linear.app](https://linear.app) with JSON output, smart ID resolution, and optimized GraphQL queries. Designed for LLM agents and humans who prefer structured data.
+Forked from [czottmann/linearis](https://github.com/czottmann/linearis) on 2026-02-17 for internal use. This is a self-maintained copy — no upstream updates are pulled automatically.
+
+**Original description:** CLI tool for [Linear.app](https://linear.app) with JSON output, smart ID resolution, and optimized GraphQL queries. Designed for LLM agents and humans who prefer structured data.
+
+## Setup
+
+```bash
+cd ~/Tools/linearis
+npm install && npm run build && npm link
+```
+
+Save a [Linear personal API key](https://linear.app/settings/api) to `~/.linear_api_token`:
+```bash
+echo "your-token-here" > ~/.linear_api_token
+```
+
+---
 
 ## Why?
 
