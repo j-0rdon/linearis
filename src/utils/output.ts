@@ -1,15 +1,32 @@
 /**
+ * Field aliases for common shorthand names.
+ * Maps user-friendly names to their actual data paths.
+ */
+const FIELD_ALIASES: Record<string, string> = {
+  status: "state.name",
+};
+
+/**
  * Filter data to only include specified fields.
- * Supports nested fields via dot notation (e.g. "creator.name").
+ * Supports nested fields via dot notation (e.g. "creator.name")
+ * and field aliases (e.g. "status" → "state.name").
  */
 function pickFields(obj: any, fields: string[]): any {
   const result: any = {};
-  for (const field of fields) {
+  for (const rawField of fields) {
+    const field = FIELD_ALIASES[rawField] || rawField;
     if (field.includes(".")) {
       const [parent, child] = field.split(".", 2);
       if (obj[parent] != null) {
-        if (!result[parent]) result[parent] = {};
-        result[parent][child] = obj[parent][child];
+        // Use the alias key (e.g. "status") as the output key if aliased
+        const outputKey = FIELD_ALIASES[rawField] ? rawField : parent;
+        if (FIELD_ALIASES[rawField]) {
+          // Flatten aliased nested fields to a top-level key
+          result[outputKey] = obj[parent][child];
+        } else {
+          if (!result[outputKey]) result[outputKey] = {};
+          result[outputKey][child] = obj[parent][child];
+        }
       }
     } else if (obj[field] !== undefined) {
       result[field] = obj[field];

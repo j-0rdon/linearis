@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file. The format 
 
 ---
 
+## [Unreleased] (fork)
+
+### Added
+
+- `--status` filter on `issues list` command (comma-separated status names, e.g. `--status "In Review,Todo"`)
+- `--summary` flag on `issues list` for aggregate status counts grouped by workflow state
+- Field alias support in `--fields`: `status` resolves to `state.name` for leaner output
+
+---
+
 ## [2025.12.3] - 2025-12-11
 
 [2025.12.3]: https://github.com/czottmann/linearis/compare/v2025.12.2...v2025.12.3

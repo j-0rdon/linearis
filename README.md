@@ -8,7 +8,9 @@ CLI tool for [Linear.app](https://linear.app) with JSON output, smart ID resolut
 
 - `--creator` filter on `issues list` and `issues search` (resolves by name, email, or UUID)
 - `--since` filter on `issues list` and `issues search` (relative durations: `3d`, `1w`, `2m`, `1y`)
-- `--fields` global flag to limit JSON output to specified fields (supports dot notation)
+- `--status` filter on `issues list` and `issues search` (comma-separated status names)
+- `--summary` flag on `issues list` for aggregate status counts
+- `--fields` global flag to limit JSON output to specified fields (supports dot notation and aliases like `status` → `state.name`)
 - `creator` field on all issue responses
 
 ## Setup
@@ -48,6 +50,13 @@ linearis issues list --since 3d -l 25
 
 # Combine filters
 linearis issues list --creator jordon --since 1w -l 50
+
+# Filter by status
+linearis issues list --creator jordon --since 1w --status "In Review"
+linearis issues list --status "In Review,Todo" -l 50
+
+# Get a quick status summary
+linearis issues list --creator jordon --since 1w --summary -l 100
 
 # Search for bugs in specific team/project
 linearis issues search "authentication" --team Platform --project "Auth Service"
@@ -207,6 +216,9 @@ linearis issues list -l 5
 
 # Lean output (specific fields only)
 linearis --fields identifier,title,creator.name issues list -l 5
+
+# Use "status" alias (resolves to state.name)
+linearis --fields identifier,title,status issues list --creator jordon --since 3d
 
 # Combine with filters for efficient agent queries
 linearis --fields identifier,title,state.name issues list --creator jordon --since 3d

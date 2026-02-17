@@ -4,6 +4,20 @@ import { GraphQLIssuesService } from "../utils/graphql-issues-service.js";
 import { createLinearService } from "../utils/linear-service.js";
 import { handleAsyncCommand, outputSuccess } from "../utils/output.js";
 import { parseSince } from "../utils/date-parser.js";
+import type { LinearIssue } from "../utils/linear-types.js";
+
+/**
+ * Aggregate issues by status, returning counts and totals.
+ */
+function summariseByStatus(issues: LinearIssue[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const issue of issues) {
+    const status = issue.state.name;
+    counts[status] = (counts[status] || 0) + 1;
+  }
+  counts["Total"] = issues.length;
+  return counts;
+}
 
 /**
  * Setup issues commands on the program
@@ -42,6 +56,8 @@ export function setupIssuesCommands(program: Command): void {
     .description("List issues.")
     .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("--since <duration>", "filter by creation date (e.g. 3d, 1w, 2m)")
+    .option("--status <status>", "filter by status (comma-separated, e.g. 'In Review,Todo')")
+    .option("--summary", "output aggregate counts grouped by status")
     .option("-l, --limit <number>", "limit results", "25")
     .action(
       handleAsyncCommand(
@@ -57,16 +73,22 @@ export function setupIssuesCommands(program: Command): void {
           );
 
           // Use filtered search if any filter is provided, otherwise plain list
-          if (options.creator || options.since) {
+          let result;
+          if (options.creator || options.since || options.status) {
             const searchArgs = {
               creatorId: options.creator,
               since: options.since ? parseSince(options.since) : undefined,
+              status: options.status ? options.status.split(",").map((s: string) => s.trim()) : undefined,
               limit: parseInt(options.limit),
             };
-            const result = await issuesService.searchIssues(searchArgs);
-            outputSuccess(result);
+            result = await issuesService.searchIssues(searchArgs);
           } else {
-            const result = await issuesService.getIssues(parseInt(options.limit));
+            result = await issuesService.getIssues(parseInt(options.limit));
+          }
+
+          if (options.summary) {
+            outputSuccess(summariseByStatus(result));
+          } else {
             outputSuccess(result);
           }
         },
