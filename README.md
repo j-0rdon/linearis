@@ -22,6 +22,7 @@ npm install && npm run build && npm link
 Save a [Linear personal API key](https://linear.app/settings/api) to `~/.linear_api_token`:
 ```bash
 echo "your-token-here" > ~/.linear_api_token
+chmod 600 ~/.linear_api_token
 ```
 
 ## Command Examples

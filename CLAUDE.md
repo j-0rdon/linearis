@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This file provides guidance to LLM agents when working with code in this repository.
 
@@ -9,13 +9,6 @@ Linearis is a CLI tool for Linear.app that outputs structured JSON data, designe
 **Design philosophy:** Minimize token usage for LLM agents while providing rich, structured data. The entire usage guide (`linearis usage`) comes in under 1000 tokens.
 
 **This is a fork** of [czottmann/linearis](https://github.com/czottmann/linearis). Upstream is not synced automatically.
-
-### Fork changes
-
-- **`creator` field** on all issue responses (id, name) — follows the assignee pattern
-- **`--creator` filter** on `issues list` and `issues search` — resolves by name, email, or UUID server-side via GraphQL
-- **`--since` filter** on `issues list` and `issues search` — relative durations: `3d` (days), `1w` (weeks), `2m` (months), `1y` (years). Filtered server-side via GraphQL `createdAt`
-- **`--fields` global flag** — limits JSON output to specified fields. Supports dot notation (e.g. `--fields identifier,title,creator.name`). Reduces token usage by ~97% for targeted queries
 
 ## Key Commands
 

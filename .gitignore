@@ -33,6 +33,10 @@ dist/
 test-*.sh
 *.test.sh
 
+# Environment files
+.env
+.env.*
+
 # Temp files etc.
 tmp/
 
