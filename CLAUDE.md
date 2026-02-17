@@ -14,6 +14,8 @@ Linearis is a CLI tool for Linear.app that outputs structured JSON data, designe
 
 - **`creator` field** on all issue responses (id, name) — follows the assignee pattern
 - **`--creator` filter** on `issues list` and `issues search` — resolves by name, email, or UUID server-side via GraphQL
+- **`--since` filter** on `issues list` and `issues search` — relative durations: `3d` (days), `1w` (weeks), `2m` (months), `1y` (years). Filtered server-side via GraphQL `createdAt`
+- **`--fields` global flag** — limits JSON output to specified fields. Supports dot notation (e.g. `--fields identifier,title,creator.name`). Reduces token usage by ~97% for targeted queries
 
 ## Key Commands
 
