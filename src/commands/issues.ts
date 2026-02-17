@@ -39,6 +39,7 @@ export function setupIssuesCommands(program: Command): void {
    */
   issues.command("list")
     .description("List issues.")
+    .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("-l, --limit <number>", "limit results", "25")
     .action(
       handleAsyncCommand(
@@ -53,9 +54,18 @@ export function setupIssuesCommands(program: Command): void {
             linearService,
           );
 
-          // Fetch issues with optimized single query
-          const result = await issuesService.getIssues(parseInt(options.limit));
-          outputSuccess(result);
+          // Use search with creator filter if provided, otherwise plain list
+          if (options.creator) {
+            const searchArgs = {
+              creatorId: options.creator,
+              limit: parseInt(options.limit),
+            };
+            const result = await issuesService.searchIssues(searchArgs);
+            outputSuccess(result);
+          } else {
+            const result = await issuesService.getIssues(parseInt(options.limit));
+            outputSuccess(result);
+          }
         },
       ),
     );
@@ -72,6 +82,7 @@ export function setupIssuesCommands(program: Command): void {
     .description("Search issues.")
     .option("--team <team>", "filter by team key, name, or ID")
     .option("--assignee <assigneeId>", "filter by assignee ID")
+    .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("--project <project>", "filter by project name or ID")
     .option("--status <status>", "filter by status (comma-separated)")
     .option("-l, --limit <number>", "limit results", "10")
@@ -91,6 +102,7 @@ export function setupIssuesCommands(program: Command): void {
             query,
             teamId: options.team, // GraphQL service handles team resolution
             assigneeId: options.assignee, // GraphQL service handles assignee resolution
+            creatorId: options.creator, // GraphQL service handles creator resolution
             projectId: options.project, // GraphQL service handles project resolution
             status: options.status ? options.status.split(",") : undefined,
             limit: parseInt(options.limit),

@@ -89,6 +89,8 @@ export const BATCH_RESOLVE_FOR_SEARCH_QUERY = `
     $teamName: String
     $projectName: String
     $assigneeEmail: String
+    $creatorName: String
+    $creatorEmail: String
   ) {
     # Resolve team if provided
     teams(
@@ -117,6 +119,21 @@ export const BATCH_RESOLVE_FOR_SEARCH_QUERY = `
 
     # Resolve user by email if provided
     users(filter: { email: { eq: $assigneeEmail } }, first: 1) {
+      nodes {
+        id
+        name
+        email
+      }
+    }
+
+    # Resolve creator by name or email if provided
+    creatorByName: users(filter: { name: { eqIgnoreCase: $creatorName } }, first: 1) {
+      nodes {
+        id
+        name
+      }
+    }
+    creatorByEmail: users(filter: { email: { eq: $creatorEmail } }, first: 1) {
       nodes {
         id
         name

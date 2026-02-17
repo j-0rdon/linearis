@@ -674,6 +674,16 @@ export class GraphQLIssuesService {
       }
     }
 
+    // Add creator for resolution if provided and not a UUID
+    if (args.creatorId && !isUuid(args.creatorId)) {
+      needsResolve = true;
+      if (args.creatorId.includes("@")) {
+        resolveVariables.creatorEmail = args.creatorId;
+      } else {
+        resolveVariables.creatorName = args.creatorId;
+      }
+    }
+
     // Execute batch resolve query if we have anything to resolve
     let resolveResult: any = {};
     if (needsResolve) {
@@ -718,6 +728,21 @@ export class GraphQLIssuesService {
       finalAssigneeId = resolveResult.users.nodes[0].id;
     }
 
+    let finalCreatorId = args.creatorId;
+    if (args.creatorId && !isUuid(args.creatorId)) {
+      if (args.creatorId.includes("@")) {
+        if (!resolveResult.creatorByEmail?.nodes?.length) {
+          throw new Error(`Creator "${args.creatorId}" not found`);
+        }
+        finalCreatorId = resolveResult.creatorByEmail.nodes[0].id;
+      } else {
+        if (!resolveResult.creatorByName?.nodes?.length) {
+          throw new Error(`Creator "${args.creatorId}" not found`);
+        }
+        finalCreatorId = resolveResult.creatorByName.nodes[0].id;
+      }
+    }
+
     // Step 2: Execute search query
     if (args.query) {
       // Use text search
@@ -748,6 +773,11 @@ export class GraphQLIssuesService {
           issue.assignee?.id === finalAssigneeId
         );
       }
+      if (finalCreatorId) {
+        results = results.filter((issue: LinearIssue) =>
+          issue.creator?.id === finalCreatorId
+        );
+      }
       if (finalProjectId) {
         results = results.filter((issue: LinearIssue) =>
           issue.project?.id === finalProjectId
@@ -766,6 +796,7 @@ export class GraphQLIssuesService {
 
       if (finalTeamId) filter.team = { id: { eq: finalTeamId } };
       if (finalAssigneeId) filter.assignee = { id: { eq: finalAssigneeId } };
+      if (finalCreatorId) filter.creator = { id: { eq: finalCreatorId } };
       if (finalProjectId) filter.project = { id: { eq: finalProjectId } };
       if (args.status && args.status.length > 0) {
         filter.state = { name: { in: args.status } };

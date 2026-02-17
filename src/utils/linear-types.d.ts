@@ -129,6 +129,7 @@ export interface SearchIssuesArgs {
   query?: string;
   teamId?: string;
   assigneeId?: string;
+  creatorId?: string;
   projectId?: string;
   status?: string[];
   limit?: number;
