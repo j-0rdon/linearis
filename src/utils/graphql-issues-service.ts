@@ -684,6 +684,16 @@ export class GraphQLIssuesService {
       }
     }
 
+    // Parse parent issue identifier if provided and not a UUID
+    if (args.parentId && !isUuid(args.parentId)) {
+      const parentParsed = tryParseIssueIdentifier(args.parentId);
+      if (parentParsed) {
+        needsResolve = true;
+        resolveVariables.parentTeamKey = parentParsed.teamKey;
+        resolveVariables.parentIssueNumber = parentParsed.issueNumber;
+      }
+    }
+
     // Execute batch resolve query if we have anything to resolve
     let resolveResult: any = {};
     if (needsResolve) {
@@ -743,6 +753,14 @@ export class GraphQLIssuesService {
       }
     }
 
+    let finalParentId = args.parentId;
+    if (args.parentId && !isUuid(args.parentId)) {
+      if (!resolveResult.parentIssues?.nodes?.length) {
+        throw new Error(`Parent issue "${args.parentId}" not found`);
+      }
+      finalParentId = resolveResult.parentIssues.nodes[0].id;
+    }
+
     // Step 2: Execute search query
     if (args.query) {
       // Use text search
@@ -783,6 +801,11 @@ export class GraphQLIssuesService {
           issue.project?.id === finalProjectId
         );
       }
+      if (finalParentId) {
+        results = results.filter((issue: LinearIssue) =>
+          issue.parentIssue?.id === finalParentId
+        );
+      }
       if (args.since) {
         results = results.filter((issue: LinearIssue) =>
           issue.createdAt >= args.since!
@@ -803,6 +826,7 @@ export class GraphQLIssuesService {
       if (finalAssigneeId) filter.assignee = { id: { eq: finalAssigneeId } };
       if (finalCreatorId) filter.creator = { id: { eq: finalCreatorId } };
       if (finalProjectId) filter.project = { id: { eq: finalProjectId } };
+      if (finalParentId) filter.parent = { id: { eq: finalParentId } };
       if (args.since) filter.createdAt = { gte: args.since };
       if (args.status && args.status.length > 0) {
         filter.state = { name: { in: args.status } };

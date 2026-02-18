@@ -57,6 +57,7 @@ export function setupIssuesCommands(program: Command): void {
     .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("--since <duration>", "filter by creation date (e.g. 3d, 1w, 2m)")
     .option("--status <status>", "filter by status (comma-separated, e.g. 'In Review,Todo')")
+    .option("--parent <parent>", "filter by parent issue (ID or identifier e.g. ENG-123)")
     .option("--summary", "output aggregate counts grouped by status")
     .option("-l, --limit <number>", "limit results", "25")
     .action(
@@ -74,9 +75,10 @@ export function setupIssuesCommands(program: Command): void {
 
           // Use filtered search if any filter is provided, otherwise plain list
           let result;
-          if (options.creator || options.since || options.status) {
+          if (options.creator || options.since || options.status || options.parent) {
             const searchArgs = {
               creatorId: options.creator,
+              parentId: options.parent,
               since: options.since ? parseSince(options.since) : undefined,
               status: options.status ? options.status.split(",").map((s: string) => s.trim()) : undefined,
               limit: parseInt(options.limit),
@@ -110,6 +112,7 @@ export function setupIssuesCommands(program: Command): void {
     .option("--creator <creator>", "filter by creator (name, email, or ID)")
     .option("--project <project>", "filter by project name or ID")
     .option("--status <status>", "filter by status (comma-separated)")
+    .option("--parent <parent>", "filter by parent issue (ID or identifier e.g. ENG-123)")
     .option("--since <duration>", "filter by creation date (e.g. 3d, 1w, 2m)")
     .option("-l, --limit <number>", "limit results", "10")
     .action(
@@ -130,6 +133,7 @@ export function setupIssuesCommands(program: Command): void {
             assigneeId: options.assignee, // GraphQL service handles assignee resolution
             creatorId: options.creator, // GraphQL service handles creator resolution
             projectId: options.project, // GraphQL service handles project resolution
+            parentId: options.parent, // GraphQL service handles parent resolution
             status: options.status ? options.status.split(",") : undefined,
             since: options.since ? parseSince(options.since) : undefined,
             limit: parseInt(options.limit),

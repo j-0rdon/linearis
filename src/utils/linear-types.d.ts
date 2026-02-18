@@ -131,6 +131,7 @@ export interface SearchIssuesArgs {
   assigneeId?: string;
   creatorId?: string;
   projectId?: string;
+  parentId?: string;
   status?: string[];
   since?: string;
   limit?: number;

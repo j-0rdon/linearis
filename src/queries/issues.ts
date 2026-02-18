@@ -91,6 +91,8 @@ export const BATCH_RESOLVE_FOR_SEARCH_QUERY = `
     $assigneeEmail: String
     $creatorName: String
     $creatorEmail: String
+    $parentTeamKey: String
+    $parentIssueNumber: Float
   ) {
     # Resolve team if provided
     teams(
@@ -138,6 +140,22 @@ export const BATCH_RESOLVE_FOR_SEARCH_QUERY = `
         id
         name
         email
+      }
+    }
+
+    # Resolve parent issue if provided
+    parentIssues: issues(
+      filter: {
+        and: [
+          { team: { key: { eq: $parentTeamKey } } }
+          { number: { eq: $parentIssueNumber } }
+        ]
+      }
+      first: 1
+    ) {
+      nodes {
+        id
+        identifier
       }
     }
   }
